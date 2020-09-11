@@ -10,4 +10,8 @@ target_link_libraries(app lib pthread)
 target_include_directories(app PUBLIC ${INCLUDE_DIR})
 
 add_executable(select_example ./select/main.c)
+target_link_libraries(select_example LOGC::LIB)
+
+add_executable(poll_example ./poll/main.c)
+target_link_libraries(poll_example LOGC::LIB)
 

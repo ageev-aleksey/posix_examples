@@ -1,3 +1,5 @@
+#define LOG_USE_COLOR
+
 #include <sys/types.h>
 #include <sys/time.h>
 #include <stdbool.h>
@@ -5,6 +7,8 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
+
+#include <log.h>
 
 
 #define SELECT_TIMEOUT 0
@@ -48,11 +52,11 @@ int main(int argc, char **argv) {
             write(STDOUT, "OK!", 4);
         }
         if (res == SELECT_TIMEOUT) {
-            const char v[] = ": select timeout \n";
-             write(STDOUT, v, sizeof(v));
+            const char v[] = ": select timeout";
+             log_warn(v);
         } else if (res == SELECT_ERROR) {
-            const char v[] = ": select ERROR -> EXIT \n";
-            write(STDOUT, (void*)v, sizeof(v));
+            const char v[] = ": select ERROR -> EXIT";
+            log_error(v);
             break;
         } else {
             read(STDIN, buffer, 256);
