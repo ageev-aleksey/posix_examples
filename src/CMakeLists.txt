@@ -15,3 +15,7 @@ target_link_libraries(select_example LOGC::LIB)
 add_executable(poll_example ./poll/main.c)
 target_link_libraries(poll_example LOGC::LIB)
 
+add_executable(signal_example ./signal/main.c)
+target_link_libraries(signal_example LOGC::LIB pthread)
+
+
