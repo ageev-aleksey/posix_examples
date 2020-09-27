@@ -9,7 +9,7 @@ if __name__ == "__main__":
 	num_clients = int(sys.argv[1])
 	ip = sys.argv[2]
 	port = int(sys.argv[3])
-	childrens = []
+	children = []
 	is_parent = True
 	for i in range(num_clients - 1):
 		pid = os.fork();
@@ -17,7 +17,7 @@ if __name__ == "__main__":
 			is_parent = False
 			break;
 		else:
-			childrens.append(pid)
+			children.append(pid)
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
 	s.settimeout(2);
 	try:
@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
 	if is_parent:
 		timeouts = 0
-		for i in range(len(childrens)):
+		for i in range(len(children)):
 			code = os.wait()
 			if code[1] == 256:
 				timeouts = timeouts + 1

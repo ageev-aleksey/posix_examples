@@ -20,7 +20,6 @@ int main(int argc, char **argv) {
     int optindex = 0;
     char ip[11] = {0};
     char port[5] = {0};
-    long count = LONG_MAX;
     struct option opts[] = {
             {"ip", true, 0, 'i'},
             {"port", true, 0, 'p'},
@@ -28,7 +27,7 @@ int main(int argc, char **argv) {
             {0, 0, 0},
     };
 
-    while ((parameter = getopt_long(argc, argv, "i:p:c:", opts, &optindex)) != -1) {
+    while ((parameter = getopt_long(argc, argv, "i:p:", opts, &optindex)) != -1) {
         switch (parameter) {
             case 'i':
                 strcpy(ip, optarg);
@@ -36,36 +35,33 @@ int main(int argc, char **argv) {
             case 'p':
                 strcpy(port, optarg);
                 break;
-            case 'c':
-                count = strtol(optarg, NULL, 10);
-                break;
             default:
                 printf("Invalid value\n");
         }
-    }
-
-    int sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (-1 == sock) {
-        perror("create socket");
-        return -1;
     }
     struct sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
     addr.sin_port = htons(strtol(port, NULL, 10));
     inet_aton(ip, &addr.sin_addr);
-    int res = connect(sock, (struct sockaddr*)&addr, sizeof(addr));
-    if (-1 == res) {
-        perror("connection");
-        return -1;
-    }
-    srand(time(NULL));
     char buffer[500] = {0};
-    for (long i = 0; i < count; i++) {
-        sleep(1);
-        sprintf(buffer, "ping -> %d", rand()%100);
+    while(true) {
+        if (scanf("%[^\n]", buffer) == 0) {
+            printf("%s", "Error reading from console\n");
+            return -1;
+        }
+        int sock = socket(AF_INET, SOCK_STREAM, 0);
+        if (-1 == sock) {
+            perror("create socket");
+            return -1;
+        }
+        int res = connect(sock, (struct sockaddr*)&addr, sizeof(addr));
+        if (-1 == res) {
+            perror("connection");
+            return -1;
+        }
         printf("Send to server: %s\n", buffer);
-        int res = send(sock, buffer, strlen(buffer), 0);
+        res = send(sock, buffer, strlen(buffer), 0);
         if (-1 == res) {
             perror("error sending");
             return -1;
@@ -78,10 +74,10 @@ int main(int argc, char **argv) {
         }
         printf("Received from server: %s\n", buffer);
         memset(buffer, 0, sizeof(buffer));
+        shutdown(sock, SHUT_RDWR);
+        close(sock);
     }
-    send(sock, "QUIT", 5, 0);
-    shutdown(sock, SHUT_RDWR);
-    close(sock);
+
     return 0;
 }
 
