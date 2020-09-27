@@ -76,7 +76,9 @@ int main(int argc, char **argv) {
     memset(&client_addr, 0, sizeof(client_addr));
 
     int client_sock = 0;
+    unsigned int i = 0;
     while (isRun) {
+        i++;
         socklen_t client_addr_len = 0;
         client_sock = accept(sock, (struct sockaddr*)&client_addr, &client_addr_len);
         if (client_sock == -1) {
@@ -89,20 +91,19 @@ int main(int argc, char **argv) {
         char buffer[500];
         memset(buffer, 0, sizeof(buffer));
         srand(time(NULL));
-        while (true) {
-            int size = recv(client_sock, buffer, sizeof(buffer), 0);
-            if (strcmp(buffer, "QUIT") == 0) {
-                printf("%s\n", "Client send request for close session!");
-                break;
-            }
-            printf("from client received: %s\n", buffer);
-            memset(buffer, 0, sizeof(buffer));
-            sprintf(buffer, "pong -> %d", rand()%100);
-            size = send(client_sock, buffer, strlen(buffer), 0);
-            if (-1 == size) {
-                perror("sending to client error");
-                break;
-            }
+        int size = recv(client_sock, buffer, sizeof(buffer), 0);
+//        if (strcmp(buffer, "QUIT") == 0) {
+//            printf("%s\n", "Client send request for close session!");
+//            break;
+//        }
+        printf("%du: from client received: %s\n",i,  buffer);
+        //  memset(buffer, 0, sizeof(buffer));
+        char send_buffer[500] = {0};
+        strcpy(send_buffer, buffer);
+        size = send(client_sock, send_buffer, strlen(send_buffer), 0);
+        if (-1 == size) {
+            perror("sending to client error");
+            break;
         }
         shutdown(client_sock, SHUT_RDWR);
         close(client_sock);
